@@ -1,0 +1,11 @@
+certifi==2020.4.5.1
+chardet==3.0.4
+colorama==0.4.3
+configparser==5.0.0
+crayons==0.3.0
+idna==2.9
+requests==2.23.0
+selenium==3.141.0
+urllib3==1.25.9
+webdriver-manager==2.3.0
+urllib3==1.26.8

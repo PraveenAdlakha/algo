@@ -1,0 +1,36 @@
+2022-02-27 23:58:17,199 - Starting new HTTPS connection (1): api.kite.trade:443
+2022-02-27 23:58:17,557 - https://api.kite.trade:443 "GET /quote?i=NSE%3ANIFTY+50 HTTP/1.1" 200 None
+2022-02-27 23:58:17,560 - This will get logged to a file
+2022-02-27 23:58:17,562 - Starting new HTTPS connection (1): api.kite.trade:443
+2022-02-27 23:58:17,855 - https://api.kite.trade:443 "GET /quote?i=NSE%3ANIFTY+BANK HTTP/1.1" 200 None
+2022-02-27 23:58:17,859 - Starting new HTTPS connection (1): api.kite.trade:443
+2022-02-27 23:58:18,232 - https://api.kite.trade:443 "GET /instruments/NFO HTTP/1.1" 200 879824
+2022-02-27 23:58:22,248 - Placing order for:BANKNIFTY2230336500CE
+2022-02-27 23:58:22,248 - Placing order for:BANKNIFTY2230336300PE
+2022-02-27 23:58:22,249 - Starting new HTTPS connection (1): api.kite.trade:443
+2022-02-27 23:58:22,564 - https://api.kite.trade:443 "GET /portfolio/positions HTTP/1.1" 200 1257
+2022-02-27 23:58:22,572 - Starting new HTTPS connection (1): api.kite.trade:443
+2022-02-27 23:58:22,897 - https://api.kite.trade:443 "GET /quote?i=NIFTY22MAR17800CE HTTP/1.1" 200 30
+2022-02-27 23:58:22,901 - Starting new HTTPS connection (1): api.kite.trade:443
+2022-02-27 23:58:23,232 - https://api.kite.trade:443 "GET /quote?i=NIFTY22MAR17800CE HTTP/1.1" 200 30
+2022-02-27 23:58:23,234 - Stoploss hit or time is up current ce price:0 and sl129
+2022-02-27 23:58:23,234 - Stoploss hit or time is up current pe price:0
+2022-02-27 23:58:23,234 - end_time:2022-02-27 10:59:00 now:2022-02-27 23:58:17.560410
+2022-02-27 23:58:52,705 - Starting new HTTPS connection (1): api.kite.trade:443
+2022-02-27 23:58:52,841 - https://api.kite.trade:443 "GET /quote?i=NSE%3ANIFTY+50 HTTP/1.1" 200 None
+2022-02-27 23:58:52,844 - This will get logged to a file
+2022-02-27 23:58:52,846 - Starting new HTTPS connection (1): api.kite.trade:443
+2022-02-27 23:58:53,123 - https://api.kite.trade:443 "GET /quote?i=NSE%3ANIFTY+BANK HTTP/1.1" 200 None
+2022-02-27 23:58:53,128 - Starting new HTTPS connection (1): api.kite.trade:443
+2022-02-27 23:58:53,477 - https://api.kite.trade:443 "GET /instruments/NFO HTTP/1.1" 200 879824
+2022-02-27 23:58:57,947 - Placing order for:BANKNIFTY2230336500CE
+2022-02-27 23:58:57,947 - Placing order for:BANKNIFTY2230336300PE
+2022-02-27 23:58:57,949 - Starting new HTTPS connection (1): api.kite.trade:443
+2022-02-27 23:58:58,254 - https://api.kite.trade:443 "GET /portfolio/positions HTTP/1.1" 200 1257
+2022-02-27 23:58:58,261 - Starting new HTTPS connection (1): api.kite.trade:443
+2022-02-27 23:58:58,568 - https://api.kite.trade:443 "GET /quote?i=NIFTY22MAR17800CE HTTP/1.1" 200 30
+2022-02-27 23:58:58,571 - Starting new HTTPS connection (1): api.kite.trade:443
+2022-02-27 23:58:58,883 - https://api.kite.trade:443 "GET /quote?i=NIFTY22MAR17800CE HTTP/1.1" 200 30
+2022-02-27 23:58:58,885 - Stoploss hit or time is up current ce price:0 and sl129
+2022-02-27 23:58:58,885 - Stoploss hit or time is up current pe price:0
+2022-02-27 23:58:58,885 - end_time:2022-02-27 10:59:00 now:2022-02-27 23:58:52.844435
