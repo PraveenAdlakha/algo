@@ -1,3 +1,4 @@
+*.log
 access_token.txt
 api_key.txt
 *.pyc

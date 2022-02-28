@@ -47,31 +47,37 @@ def get_symbols(expiry, name, strike, ins_type):
 def getNearestCEStrikeByPrice(expiry, name, strike,ins_type , price):
     global instrumentsList
     atmStrike = strike
-    current_strike = int(strike) + 100
+    current_strike = int(strike)
 
     if instrumentsList is None:
         instrumentsList = kite.instruments('NFO')
 
     for num in instrumentsList:
         if num['expiry'] == expiry and num['strike'] == current_strike and num['instrument_type'] == ins_type and num['name'] == name:
-            current_strike = current_strike + 100
-            if num['last_price'] <= price:
+            if ins_type == "CE":
+                current_strike = current_strike + 100
+            if ins_type == "PE":
+                current_strike = current_strike - 100
+            if getCMP("NFO:"+ str(num['tradingsymbol'])) <= price:
                 return num['tradingsymbol']
 
 
 def getNearestPEStrikeByPrice(expiry, name, strike,ins_type , price):
     global instrumentsList
     atmStrike = strike
-    current_strike = int(strike) - 100
+    current_strike = int(strike)
 
     if instrumentsList is None:
         instrumentsList = kite.instruments('NFO')
-
-    for num in instrumentsList:
-        if num['expiry'] == expiry and num['strike'] == current_strike and num['instrument_type'] == ins_type and num['name'] == name:
-            current_strike = current_strike - 100
-            if num['last_price'] <= price:
-                return num['tradingsymbol']
+    df = pd.DataFrame(instrumentsList)
+    df1 = df[(df.instrument_type == ins_type ) & (df.name == name) & (df.expiry == expiry)]
+    if(ins_type == "PE"):
+       df2 =  df1.sort_values(by=['strike'], ascending=False)
+    if(ins_type == "CE"):
+        df2 = df1.sort_values(by=['strike'], ascending=True)
+    for row in df2.itertuples():
+        if int(getCMP("NFO:"+ str(getattr(row,'tradingsymbol')))<= int(price)) and int((getattr(row,'strike'))< int(strike)):
+            return getattr(row,'tradingsymbol')
 
 
 def getNearestStrikePrice(price, nearestMultiple=50):
@@ -101,62 +107,75 @@ def place_order(tradingSymbol, price, qty, transaction_type, exchangeType, produ
         logging.INFO('Order placement failed: %s', e.message)
 
 
-def timeBasedStraddleSelling(start_time, end_time, price, stop_loss, lots):
+def timeBasedStraddleSelling(start_time, end_time, price, stop_loss, qty):
+
+    if (now < start_time) :
+        time.sleep(4)
 
 
-    if(now > start_time):
+    if(now > start_time and end_time > now):
         BankNiftyATMStrike = getNearestStrikePrice(getCMP('NSE:NIFTY BANK'), 100)
         bank_nifty_symbol_ce = getNearestCEStrikeByPrice(next_thursday_expiry.date(), 'BANKNIFTY', BankNiftyATMStrike,
                                                          'CE',
                                                          price)
         bank_nifty_symbol_pe = getNearestPEStrikeByPrice(next_thursday_expiry.date(), 'BANKNIFTY', BankNiftyATMStrike,
                                                          'PE',price)
-        logging.debug("Placing order for:" + bank_nifty_symbol_ce)
-        logging.debug("Placing order for:"+ bank_nifty_symbol_pe)
-        #time.sleep(5)
-
-        # place_order(bank_nifty_symbol_ce, 0, lots, kite.TRANSACTION_TYPE_SELL, KiteConnect.EXCHANGE_NFO, KiteConnect.PRODUCT_MIS,
-        #             KiteConnect.ORDER_TYPE_MARKET)
-        #
-        # place_order(bank_nifty_symbol_pe, 0, lots, kite.TRANSACTION_TYPE_SELL, KiteConnect.EXCHANGE_NFO, KiteConnect.PRODUCT_MIS,
-        #             KiteConnect.ORDER_TYPE_MARKET)
-
-        monitorStrangleSold(end_time, bank_nifty_symbol_pe, bank_nifty_symbol_ce, stop_loss, lots)
+        logging.debug("Placing order for:" + str(bank_nifty_symbol_ce))
+        logging.debug("Placing order for:" + str(bank_nifty_symbol_pe))
 
 
-def monitorStrangleSold(end_time, bank_nifty_symbol_pe, bank_nifty_symbol_ce, stop_loss, lots):
+        place_order(bank_nifty_symbol_ce, 0, qty, kite.TRANSACTION_TYPE_SELL, KiteConnect.EXCHANGE_NFO, KiteConnect.PRODUCT_NRML,
+                    KiteConnect.ORDER_TYPE_MARKET)
+
+        place_order(bank_nifty_symbol_pe, 0, qty, kite.TRANSACTION_TYPE_SELL, KiteConnect.EXCHANGE_NFO, KiteConnect.PRODUCT_NRML,
+                    KiteConnect.ORDER_TYPE_MARKET)
+        time.sleep(5)
+
+        monitorStrangleSold(end_time, "NFO:" + bank_nifty_symbol_pe, "NFO:" + bank_nifty_symbol_ce, stop_loss, qty)
+    else:
+        logging.debug("Current time is out of start and end time.")
+
+
+def monitorStrangleSold(end_time, bank_nifty_symbol_pe, bank_nifty_symbol_ce, stop_loss, qty):
 
     pos_df = pd.DataFrame(kite.positions()["net"])
     #TODO change it to day net is for older position
     #pos_df = pd.DataFrame(kite.positions()["day"])
-
-    bank_nifty_symbol_pe = "NIFTY22MAR17800CE"
-    bank_nifty_symbol_ce = "NIFTY22MAR17800CE"
 
     filter_pe = pos_df[pos_df["tradingsymbol"]== bank_nifty_symbol_pe]
     filter_ce = pos_df[pos_df["tradingsymbol"]== bank_nifty_symbol_ce]
 
     sold_ce_price = filter_pe["average_price"].astype(int)
     sold_pe_price = filter_ce["average_price"].astype(int)
+    #sold_ce_price = 175
+    #sold_pe_price = 160
 
-    price_to_get_out_of_trade = (stop_loss + sold_ce_price + sold_pe_price).values[0]
+#    price_to_get_out_of_trade = (stop_loss + sold_ce_price + sold_pe_price).values[0]
 
+    price_to_get_out_of_trade = (stop_loss + sold_ce_price + sold_pe_price)
 
+    lowest = price_to_get_out_of_trade
     #print("Price to get out:"+ price_to_get_out_of_trade)
 
     while(True):
+        #Trailing stoploss updation logic
         current_ce_price = getCMP(bank_nifty_symbol_ce)
         current_pe_price = getCMP(bank_nifty_symbol_pe)
-        if((current_ce_price + current_pe_price > price_to_get_out_of_trade) or end_time < now):
+        lowest = min((current_ce_price + current_pe_price + stop_loss) , lowest)
+        if(lowest < price_to_get_out_of_trade):
+            price_to_get_out_of_trade = lowest
+            logging.debug("new price to get out:"+ str(price_to_get_out_of_trade))
+        if((current_ce_price + current_pe_price > price_to_get_out_of_trade) or end_time< datetime.now()):
             logging.debug("Stoploss hit or time is up current ce price:"+ str(current_ce_price + current_pe_price)+ " and sl"+ str( price_to_get_out_of_trade))
             logging.debug("Stoploss hit or time is up current pe price:" + str(current_pe_price))
             logging.debug("end_time:" + str(end_time) + " now:" + str(now))
-            #place_order(bank_nifty_symbol_ce, 0, lots, kite.TRANSACTION_TYPE_BUY, KiteConnect.EXCHANGE_NFO,
-            #            KiteConnect.PRODUCT_MIS,KiteConnect.ORDER_TYPE_MARKET)
-            #place_order(bank_nifty_symbol_pe, 0, lots, kite.TRANSACTION_TYPE_SELL, KiteConnect.EXCHANGE_NFO,
-            #            KiteConnect.PRODUCT_MIS, KiteConnect.ORDER_TYPE_MARKET)
+            place_order(bank_nifty_symbol_ce, 0, qty, kite.TRANSACTION_TYPE_BUY, KiteConnect.EXCHANGE_NFO,
+                       KiteConnect.PRODUCT_NRML,KiteConnect.ORDER_TYPE_MARKET)
+            place_order(bank_nifty_symbol_pe, 0, qty, kite.TRANSACTION_TYPE_SELL, KiteConnect.EXCHANGE_NFO,
+                       KiteConnect.PRODUCT_NRML, KiteConnect.ORDER_TYPE_MARKET)
             break
         time.sleep(2)
+        logging.debug("CMP CE:"+ str(current_pe_price) + " CMP PE:"+ str(current_ce_price) + " and sl" +  str( price_to_get_out_of_trade))
 
 
 
@@ -175,14 +194,16 @@ if __name__ == '__main__':
     # nifty_symbol_pe = get_symbols(next_thursday_expiry.date(), 'NIFTY', NiftyATMStrike, 'PE')
     #
 
-    logging.warning('This will get logged to a file')
-
     now = datetime.now()
     start_time = now.replace(hour=9, minute=20, second=0, microsecond=0)
     end_time = now.replace(hour=10, minute=59, second=0, microsecond=0)
     print("end_time:"+ str( end_time.time()))
 
     timeBasedStraddleSelling(start_time,end_time, 175, 15, 25)
+
+    #timeBasedStraddleSelling()
+
+    #monitorStrangleSold(end_time, "NFO:BANKNIFTY2230334400PE", "NFO:BANKNIFTY2230337400CE", 15, 25)
 
 
 
