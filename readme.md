@@ -6,3 +6,5 @@ conda install  request
 conda install pandas
 
 pip install selenium
+
+pip install pyotp
