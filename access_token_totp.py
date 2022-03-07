@@ -11,6 +11,7 @@ import time
 import os
 from pyotp import TOTP
 from urllib.parse import urlparse, parse_qsl
+import pandas as pd
 
 
 cwd = os.chdir("/Users/padlakha/git/algo")
@@ -55,3 +56,9 @@ kite = KiteConnect(api_key=key_secret[0])
 data = kite.generate_session(request_token, api_secret=key_secret[1])
 with open('access_token.txt', 'w') as file:
         file.write(data["access_token"])
+instrument_dump = kite.instruments("NSE")
+instrument_df = pd.DataFrame(instrument_dump)
+instrument_df.to_csv("NSE_Instruments.csv",index=False)
+instrument_dump = kite.instruments("NFO")
+instrument_df = pd.DataFrame(instrument_dump)
+instrument_df.to_csv("NFO_Instruments.csv",index=False)
