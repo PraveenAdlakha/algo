@@ -107,11 +107,10 @@ def place_order(tradingSymbol, price, qty, transaction_type, exchangeType, produ
         logging.debug('Order placement failed: %s', e.message)
 
 
-def timeBasedStraddleSelling(start_time, end_time, price, stop_loss, qty):
+def timeBasedStraddleSelling(start_time, end_time, price, stop_loss,target , qty):
 
     while (datetime.now() < start_time) :
-        time.sleep(4)
-        current_time =  datetime.now()
+        time.sleep(10)
         logging.debug("Wating for starttime:" + start_time.strftime("%m/%d/%Y, %H:%M:%S") + " right now its :  " + datetime.now().strftime("%d/%m/%Y %H:%M:%S"))
 
 
@@ -135,12 +134,12 @@ def timeBasedStraddleSelling(start_time, end_time, price, stop_loss, qty):
         pe_price = getCMP("NFO:"+bank_nifty_symbol_pe)
         time.sleep(5)
 
-        monitorStrangleSold(end_time, bank_nifty_symbol_pe, bank_nifty_symbol_ce, stop_loss, qty, ce_price, pe_price)
+        monitorStrangleSold(end_time, bank_nifty_symbol_pe, bank_nifty_symbol_ce, stop_loss, qty, ce_price, pe_price, target)
     else:
         logging.debug("Current time is out of start and end time.")
 
 
-def monitorStrangleSold(end_time, bank_nifty_symbol_pe, bank_nifty_symbol_ce, stop_loss, qty,ce_price ,pe_price ):
+def monitorStrangleSold(end_time, bank_nifty_symbol_pe, bank_nifty_symbol_ce, stop_loss, qty,ce_price ,pe_price, target):
 
     #pos_df = pd.DataFrame(kite.positions()["net"])
     #TODO change it to day net is for older position
@@ -173,7 +172,8 @@ def monitorStrangleSold(end_time, bank_nifty_symbol_pe, bank_nifty_symbol_ce, st
         except Exception as e:
             logging.debug('Exception in monitoring %s', e.message)
             pass
-        if((current_ce_price + current_pe_price > price_to_get_out_of_trade) or end_time< datetime.now()):
+        if((current_ce_price + current_pe_price > price_to_get_out_of_trade) or end_time< datetime.now() or
+                (current_pe_price + current_ce_price+ target) < (sold_pe_price+ sold_ce_price)):
             logging.debug("Stoploss hit or time is up current strangle price:"+ str(current_ce_price + current_pe_price)+ " and sl"+ str( price_to_get_out_of_trade))
             logging.debug("Current points:" + str(sold_ce_price+ sold_pe_price - current_pe_price- current_ce_price))
             logging.debug("end_time:" + str(end_time) + " now:" + str(now))
@@ -183,7 +183,7 @@ def monitorStrangleSold(end_time, bank_nifty_symbol_pe, bank_nifty_symbol_ce, st
                            KiteConnect.PRODUCT_NRML, KiteConnect.ORDER_TYPE_MARKET)
             break
             time.sleep(2)
-            logging.debug("CMP CE:"+ str(current_ce_price) + " CMP PE:"+ str(current_pe_price) + " and sl:" +  str( price_to_get_out_of_trade))
+        logging.debug("CMP: "+ str(current_ce_price+ current_pe_price)  + " and sl: " +  str( price_to_get_out_of_trade))
 
 
 
@@ -194,33 +194,42 @@ if __name__ == '__main__':
     # square of the strikes at 2:59 if SL not hit and place new order at 3 for 175 strikes
     # Square of the strikes at 3:58
     # Find ATM Strike of Nifty
-    NiftyATMStrike = getNearestStrikePrice(getCMP('NSE:NIFTY 50'))
+    # NiftyATMStrike = getNearestStrikePrice(getCMP('NSE:NIFTY 50'))
 
     next_thursday_expiry = datetime.today() + relativedelta(weekday=TH(1))
 
-    qty = 200
+    qty = 300
     now = datetime.now()
-    start_time = now.replace(hour=9, minute=30, second=0, microsecond=0)
-    end_time = now.replace(hour=11, minute=25, second=0, microsecond=0)
-    print("end_time:"+ str( end_time.time()))
-
-    timeBasedStraddleSelling(start_time,end_time, 175, 15, qty)
+    target = 30
+    stoploss = 15
+    price_to_sell = 175
+    # start_time = now.replace(hour=9, minute=30, second=0, microsecond=0)
+    # end_time = now.replace(hour=11, minute=25, second=0, microsecond=0)
+    # print("end_time:"+ str( end_time.time()))
+    #
+    # timeBasedStraddleSelling(start_time, end_time, price_to_sell, stoploss, target, qty)
 
     start_time = now.replace(hour=11, minute=30, second=0, microsecond=0)
     end_time = now.replace(hour=13, minute=25, second=0, microsecond=0)
     print("end_time:"+ str( end_time.time()))
 
-    timeBasedStraddleSelling(start_time,end_time, 175, 15, qty)
+    timeBasedStraddleSelling(start_time, end_time, price_to_sell, stoploss, target, qty)
 
-    start_time = now.replace(hour=15, minute=6, second=0, microsecond=0)
-    end_time = now.replace(hour=15, minute=20, second=0, microsecond=0)
+    start_time = now.replace(hour=13, minute=30, second=0, microsecond=0)
+    end_time = now.replace(hour=14, minute=55, second=0, microsecond=0)
     print("end_time:"+ str( end_time.time()))
 
-    timeBasedStraddleSelling(start_time, end_time, 175, 15, qty)
+    timeBasedStraddleSelling(start_time, end_time, price_to_sell, stoploss, target, qty)
+
+    # start_time = now.replace(hour=15, minute=0, second=0, microsecond=0)
+    # end_time = now.replace(hour=15, minute=20, second=0, microsecond=0)
+    # print("end_time:"+ str( end_time.time()))
+
+    #timeBasedStraddleSelling(start_time, end_time, price_to_sell, stoploss, target, qty)
 
     #timeBasedStraddleSelling()
 
-    #monitorStrangleSold(end_time, "BANKNIFTY2231035900CE", "BANKNIFTY2231035900PE", 15, qty, 10500,10500)
+    #monitorStrangleSold(end_time, "BANKNIFTY2231034200CE", "BANKNIFTY2231033300PE", 15, qty, 163.36,191.9, 25)
 
     # pos_df = pd.DataFrame(kite.positions()["day"])
     # net_df = pos_df = pd.DataFrame(kite.positions()["net"])

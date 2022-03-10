@@ -75,7 +75,7 @@ def sellBankNiftyStraddleAndMonitor( inst_name, qty):
     for row in df1.itertuples():
         pe_trading_symbol = getattr(row, 'tradingsymbol')
 
-    df1 = df[(df.instrument_type == 'PE') & (df.name == inst_name) & (df.strike == ATMStrike) & (
+    df1 = df[(df.instrument_type == 'CE') & (df.name == inst_name) & (df.strike == ATMStrike) & (
                 df.expiry == str(next_thursday_expiry))]
 
     for row in df1.itertuples():
@@ -97,13 +97,15 @@ def sellBankNiftyStraddleAndMonitor( inst_name, qty):
                     KiteConnect.ORDER_TYPE_MARKET)
         while(True):
             time.sleep(2)
-            cmp_ce = getCMP("NFO:" + avg_quote_ce_price)
-            cmp_pe = getCMP("NFO:" + avg_quote_pe_price)
+            cmp_ce = getCMP("NFO:" + ce_trading_symbol)
+            cmp_pe = getCMP("NFO:" + pe_trading_symbol)
             quote_ce = getQuote("NFO:" + ce_trading_symbol)
             quote_pe = getQuote("NFO:" + pe_trading_symbol)
 
             avg_quote_ce_price = quote_ce["NFO:" + ce_trading_symbol]['average_price']
             avg_quote_pe_price = quote_pe["NFO:" + pe_trading_symbol]['average_price']
+
+            logging.debug("cmp_ce:" + str(cmp_ce) + "cmp_pe:" + str(cmp_pe) + " sl and vwap:" + str(avg_quote_ce_price + avg_quote_pe_price + 5))
 
             if(cmp_ce+ cmp_pe  > avg_quote_pe_price+ avg_quote_ce_price + 5):
                 place_order(pe_trading_symbol,0, qty, kite.TRANSACTION_TYPE_BUY, KiteConnect.EXCHANGE_NFO,
@@ -112,6 +114,7 @@ def sellBankNiftyStraddleAndMonitor( inst_name, qty):
                 place_order(ce_trading_symbol,0, qty, kite.TRANSACTION_TYPE_BUY, KiteConnect.EXCHANGE_NFO,
                             KiteConnect.PRODUCT_NRML,
                             KiteConnect.ORDER_TYPE_MARKET)
+                break
 
 
 
@@ -119,5 +122,5 @@ if __name__ == '__main__':
     # We will sell straddle when its below vwap and do some trailing to bring sl to cost
     # exit when you are in certain profit of 40-50 points it should give better return on wednesday and thursday
 
-    qty = 200
+    qty = 25
     sellStraddleAndMonitor = sellBankNiftyStraddleAndMonitor('BANKNIFTY', qty)
