@@ -200,7 +200,7 @@ if __name__ == '__main__':
 
     qty = 300
     now = datetime.now()
-    target = 30
+    target = 35
     stoploss = 15
     price_to_sell = 175
     # start_time = now.replace(hour=9, minute=30, second=0, microsecond=0)
@@ -208,15 +208,15 @@ if __name__ == '__main__':
     # print("end_time:"+ str( end_time.time()))
     #
     # timeBasedStraddleSelling(start_time, end_time, price_to_sell, stoploss, target, qty)
-
-    start_time = now.replace(hour=11, minute=30, second=0, microsecond=0)
-    end_time = now.replace(hour=13, minute=25, second=0, microsecond=0)
-    print("end_time:"+ str( end_time.time()))
-
-    timeBasedStraddleSelling(start_time, end_time, price_to_sell, stoploss, target, qty)
+    #
+    # start_time = now.replace(hour=11, minute=30, second=0, microsecond=0)
+    # end_time = now.replace(hour=13, minute=25, second=0, microsecond=0)
+    # print("end_time:"+ str( end_time.time()))
+    #
+    # timeBasedStraddleSelling(start_time, end_time, price_to_sell, stoploss, target, qty)
 
     start_time = now.replace(hour=13, minute=30, second=0, microsecond=0)
-    end_time = now.replace(hour=14, minute=55, second=0, microsecond=0)
+    end_time = now.replace(hour=15, minute=20, second=0, microsecond=0)
     print("end_time:"+ str( end_time.time()))
 
     timeBasedStraddleSelling(start_time, end_time, price_to_sell, stoploss, target, qty)
@@ -225,7 +225,7 @@ if __name__ == '__main__':
     # end_time = now.replace(hour=15, minute=20, second=0, microsecond=0)
     # print("end_time:"+ str( end_time.time()))
 
-    #timeBasedStraddleSelling(start_time, end_time, price_to_sell, stoploss, target, qty)
+    timeBasedStraddleSelling(start_time, end_time, price_to_sell, stoploss, target, qty)
 
     #timeBasedStraddleSelling()
 
