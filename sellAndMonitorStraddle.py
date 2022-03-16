@@ -14,6 +14,7 @@ access_token = open("access_token.txt",'r').read()
 key_secret = open("api_key.txt",'r').read().split()
 kite = KiteConnect(api_key=key_secret[0])
 kite.set_access_token(access_token)
+logging.basicConfig(filename='./logs/sellAndMonitorStraddle.log', filemode='a', format='%(asctime)s - %(message)s',level=logging.DEBUG)
 
 
 def getCMP(tradingSymbol):
@@ -73,7 +74,7 @@ def monitorSoldStrike(bank_nifty_symbol_pe,bank_nifty_symbol_ce, ce_sold_price, 
             place_order(bank_nifty_symbol_pe, 0, qty, kite.TRANSACTION_TYPE_BUY, KiteConnect.EXCHANGE_NFO,
                         KiteConnect.PRODUCT_NRML, KiteConnect.ORDER_TYPE_MARKET)
             break
-        logging.debug("Monitoring cmp :"+ str(ce_current_price+ pe_current_price) + " Profit:"+ str(pe_sold_price+ ce_sold_price))
+        logging.debug("Monitoring cmp :"+ str(ce_current_price+ pe_current_price) + " Profit:"+ str(pe_sold_price+ ce_sold_price-ce_current_price- pe_current_price))
 
         if(ce_current_price+ pe_current_price+ target < ce_sold_price + pe_sold_price ):
             logging.debug("target hit, getting out CMP:"+ str(ce_current_price+ pe_current_price+ target))
@@ -91,10 +92,12 @@ def monitorSoldStrike(bank_nifty_symbol_pe,bank_nifty_symbol_ce, ce_sold_price, 
 
 
 if __name__ == '__main__':
-    bank_nifty_symbol_ce = "BANKNIFTY2231734500CE"
-    bank_nifty_symbol_pe = "BANKNIFTY2231734500PE"
-    sell_price = 1450
-    stoploss = 20
+    bank_nifty_symbol_ce = "BANKNIFTY2231735400CE"
+    bank_nifty_symbol_pe = "BANKNIFTY2231735400PE"
+    sell_price = 1150
+    stoploss = 0
     qty = 25
     target = 100
-    sellAndMonitorStraddle(bank_nifty_symbol_ce,bank_nifty_symbol_pe, sell_price, stoploss, qty, target)
+    #sellAndMonitorStraddle(bank_nifty_symbol_ce,bank_nifty_symbol_pe, sell_price, stoploss, qty, target)
+
+    monitorSoldStrike(bank_nifty_symbol_pe,bank_nifty_symbol_ce, 504.30 ,625.10 , stoploss, qty, target)

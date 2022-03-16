@@ -1,6 +1,7 @@
 *.log
 access_token.txt
 api_key.txt
+telegram*
 *.pyc
 node_modules/
 .ve/

@@ -9,8 +9,10 @@ import pandas as pd
 import datetime as dt
 import os
 import numpy as np
+import requests
+from telethon import TelegramClient, sync, events
 
-cwd = os.chdir("D:\\Udemy\\Zerodha KiteConnect API\\1_account_authorization")
+cwd = os.chdir("/Users/padlakha/git/algo")
 
 #generate trading session
 access_token = open("access_token.txt",'r').read()
@@ -19,8 +21,20 @@ kite = KiteConnect(api_key=key_secret[0])
 kite.set_access_token(access_token)
 
 #get dump of all NSE instruments
-instrument_dump = kite.instruments("NSE")
-instrument_df = pd.DataFrame(instrument_dump)
+#instrument_dump = kite.instruments("NSE")
+instrument_df = pd.read_csv("NFO_Instruments.csv")
+
+api_id = '16772457'
+api_hash = '71068179e49803189b0d507f4474448a'
+token = 'bot token'
+message = "Working..."
+
+# your phone number
+phone = '+917259233663'
+
+client = TelegramClient('session', api_id, api_hash)
+
+
 
 def instrumentLookup(instrument_df,symbol):
     """Looks up instrument token for a given script from instrument dump"""
@@ -86,5 +100,11 @@ def supertrend(DF,n,m):
             df.loc[ind[i],'Strend']=df['U-B'][i]
     return df['Strend']
 
-ohlc = fetchOHLC("INFY","5minute",5)
-strend = supertrend(ohlc,7,3)
+
+
+if __name__ == '__main__':
+    telegram_path = "telegram.config"
+    telegram_settings = open(telegram_path, 'r').read().split()
+    telegram_url = telegram_settings[0].format("my msg")
+    print(telegram_url)
+    requests.get(telegram_url)

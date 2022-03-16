@@ -198,32 +198,32 @@ if __name__ == '__main__':
 
     next_thursday_expiry = datetime.today() + relativedelta(weekday=TH(1))
 
-    qty = 300
+    qty = 500
     now = datetime.now()
     target = 35
     stoploss = 15
     price_to_sell = 175
-    # start_time = now.replace(hour=9, minute=30, second=0, microsecond=0)
-    # end_time = now.replace(hour=11, minute=25, second=0, microsecond=0)
-    # print("end_time:"+ str( end_time.time()))
-    #
-    # timeBasedStraddleSelling(start_time, end_time, price_to_sell, stoploss, target, qty)
-    #
-    # start_time = now.replace(hour=11, minute=30, second=0, microsecond=0)
-    # end_time = now.replace(hour=13, minute=25, second=0, microsecond=0)
-    # print("end_time:"+ str( end_time.time()))
-    #
-    # timeBasedStraddleSelling(start_time, end_time, price_to_sell, stoploss, target, qty)
+    start_time = now.replace(hour=9, minute=30, second=0, microsecond=0)
+    end_time = now.replace(hour=11, minute=25, second=0, microsecond=0)
+    print("end_time:"+ str( end_time.time()))
 
-    start_time = now.replace(hour=13, minute=30, second=0, microsecond=0)
+    timeBasedStraddleSelling(start_time, end_time, price_to_sell, stoploss, target, qty)
+
+    start_time = now.replace(hour=11, minute=30, second=0, microsecond=0)
+    end_time = now.replace(hour=13, minute=25, second=0, microsecond=0)
+    print("end_time:"+ str( end_time.time()))
+
+    timeBasedStraddleSelling(start_time, end_time, price_to_sell, stoploss, target, qty)
+
+    start_time = now.replace(hour=15, minute=00, second=0, microsecond=0)
     end_time = now.replace(hour=15, minute=20, second=0, microsecond=0)
     print("end_time:"+ str( end_time.time()))
 
     timeBasedStraddleSelling(start_time, end_time, price_to_sell, stoploss, target, qty)
 
-    # start_time = now.replace(hour=15, minute=0, second=0, microsecond=0)
-    # end_time = now.replace(hour=15, minute=20, second=0, microsecond=0)
-    # print("end_time:"+ str( end_time.time()))
+    start_time = now.replace(hour=15, minute=0, second=0, microsecond=0)
+    end_time = now.replace(hour=15, minute=20, second=0, microsecond=0)
+    print("end_time:"+ str( end_time.time()))
 
     timeBasedStraddleSelling(start_time, end_time, price_to_sell, stoploss, target, qty)
 
